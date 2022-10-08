@@ -42,4 +42,43 @@ public class ContactRepository  {
         entityManager.remove(contact);
     }
 
+    // find by Name, Email, Address. Sort by Name, Email, Address (asc, desc)
+    public List<Contact> search(String name, String email, String address, String sortValue, String sortDirection) {
+        String jpql = "select c from Contact c where 1=1";
+
+        if (name != null && !name.isEmpty()) {
+            jpql += " and c.name like :name";
+        }
+        if (email != null && !email.isEmpty()) {
+            jpql += " and c.email like :email";
+        }
+        if (address != null && !address.isEmpty()) {
+            jpql += " and c.address like :address";
+        }
+
+        if(sortDirection == null || sortDirection.isEmpty()) {
+            sortDirection = "desc";
+        }
+
+        if (sortValue == null || sortValue.isEmpty()) {
+            sortValue = "id";
+        }
+
+        jpql += " order by c." + sortValue + " " + sortDirection;
+
+        System.out.println("jpql: " + jpql);
+        TypedQuery<Contact> query = entityManager.createQuery(jpql, Contact.class);
+        if (name != null && !name.isEmpty()) {
+            query.setParameter("name", "%" + name + "%");
+        }
+        if (email != null && !email.isEmpty()) {
+            query.setParameter("email", "%" + email + "%");
+        }
+        if (address != null && !address.isEmpty()) {
+            query.setParameter("address", "%" + address + "%");
+        }
+
+        return query.getResultList();
+    }
+
 }

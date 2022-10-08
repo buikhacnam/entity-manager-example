@@ -7,6 +7,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.util.List;
+
 @SpringBootApplication
 public class EntityManagerExampleApplication implements CommandLineRunner {
 
@@ -24,6 +26,7 @@ public class EntityManagerExampleApplication implements CommandLineRunner {
 //		findById();
 //		update();
 //		deleteById();
+		search();
 	}
 
 	private void saveContact() {
@@ -51,6 +54,24 @@ public class EntityManagerExampleApplication implements CommandLineRunner {
 
 	private void deleteById() {
 		contactRepository.deleteById(1L);
+	}
+
+	private void search() {
+		List<Contact> result = contactRepository.search("", "", "", "", "desc");
+		System.out.println("result");
+		result.forEach(System.out::println);
+
+		List<Contact> result1 = contactRepository.search("drogba", "", "", "name", "asc");
+		System.out.println("result1");
+		result1.forEach(System.out::println);
+
+		List<Contact> result2 = contactRepository.search("", "", "", "email", "desc");
+		System.out.println("result2");
+		result2.forEach(System.out::println);
+
+		List<Contact> result3 = contactRepository.search("casey", "caseybui", "new york", "", "");
+		System.out.println("result3");
+		result3.forEach(System.out::println);
 	}
 
 }
