@@ -1,0 +1,3 @@
+Using `EntityManager` to query data from database (including filtering and sorting with pageable). In this example, we use `MySQL` database. You can change to other database by changing `application.properties` file.
+
+Please check [ContactRepository](https://github.com/buikhacnam/entity-manager-example/blob/main/src/main/java/com/buinam/entitymanagerexample/repository/ContactRepository.java) for more details.
