@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -26,7 +29,8 @@ public class EntityManagerExampleApplication implements CommandLineRunner {
 //		findById();
 //		update();
 //		deleteById();
-		search();
+//		search();
+//		searchWithPagable();
 	}
 
 	private void saveContact() {
@@ -72,6 +76,13 @@ public class EntityManagerExampleApplication implements CommandLineRunner {
 		List<Contact> result3 = contactRepository.search("casey", "caseybui", "new york", "", "");
 		System.out.println("result3");
 		result3.forEach(System.out::println);
+	}
+
+	private void searchWithPagable() {
+		Pageable pageable = PageRequest.of(0, 2);
+		Page<Contact> result = contactRepository.search("", "", "", "", "desc", pageable);
+		System.out.println("result "+ result);
+		result.forEach(System.out::println);
 	}
 
 }
