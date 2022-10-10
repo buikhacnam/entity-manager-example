@@ -136,8 +136,15 @@ public class ContactRepository  {
             queryCount.setParameter("address", "%" + address + "%");
         }
 
-        query.setFirstResult(pageable.getPageNumber() * pageable.getPageSize());
+        // if not using Pageable, we can get the first result and max result from the query.
+        /*
+        if (pageable.getPageNumber() > 0) {
+            query.setFirstResult((pageable.getPageNumber() - 1) * pageable.getPageSize());
+        } else {
+            query.setFirstResult(0);
+        }
         query.setMaxResults(pageable.getPageSize());
+         */
 
         List<Contact> contacts = query.getResultList();
 
