@@ -6,11 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 @SpringBootApplication
 public class EntityManagerExampleApplication implements CommandLineRunner {
@@ -29,8 +24,6 @@ public class EntityManagerExampleApplication implements CommandLineRunner {
 //		findById();
 //		update();
 //		deleteById();
-//		search();
-//		searchWithPagable();
 	}
 
 	private void saveContact() {
@@ -60,29 +53,5 @@ public class EntityManagerExampleApplication implements CommandLineRunner {
 		contactRepository.deleteById(1L);
 	}
 
-	private void search() {
-		List<Contact> result = contactRepository.search("", "", "", "", "desc");
-		System.out.println("result");
-		result.forEach(System.out::println);
-
-		List<Contact> result1 = contactRepository.search("drogba", "", "", "name", "asc");
-		System.out.println("result1");
-		result1.forEach(System.out::println);
-
-		List<Contact> result2 = contactRepository.search("", "", "", "email", "desc");
-		System.out.println("result2");
-		result2.forEach(System.out::println);
-
-		List<Contact> result3 = contactRepository.search("casey", "caseybui", "new york", "", "");
-		System.out.println("result3");
-		result3.forEach(System.out::println);
-	}
-
-	private void searchWithPagable() {
-		Pageable pageable = PageRequest.of(0, 2);
-		Page<Contact> result = contactRepository.search("", "", "", "", "desc", pageable);
-		System.out.println("result "+ result);
-		result.forEach(System.out::println);
-	}
 
 }

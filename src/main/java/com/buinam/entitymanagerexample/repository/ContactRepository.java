@@ -1,5 +1,7 @@
 package com.buinam.entitymanagerexample.repository;
+
 import com.buinam.entitymanagerexample.entity.Contact;
+import org.hibernate.query.internal.NativeQueryImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -10,10 +12,11 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.transaction.Transactional;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @Repository
-public class ContactRepository  {
+public class ContactRepository {
     @Autowired
     private EntityManager entityManager;
 
@@ -46,9 +49,9 @@ public class ContactRepository  {
         entityManager.remove(contact);
     }
 
-    // find by Name, Email, Address. Sort by Name, Email, Address (asc, desc)
-    public List<Contact> search(String name, String email, String address, String sortValue, String sortDirection) {
-        String jpql = "select c from Contact c where 1=1";
+    // search
+    public List<LinkedHashMap<String, Object>> search(String name, String email, String address, String sortValue, String sortDirection) {
+        String jpql = "select c.* from Contact c where 1=1";
 
         if (name != null && !name.isEmpty()) {
             jpql += " and c.name like :name";
@@ -60,7 +63,7 @@ public class ContactRepository  {
             jpql += " and c.address like :address";
         }
 
-        if(sortDirection == null || sortDirection.isEmpty()) {
+        if (sortDirection == null || sortDirection.isEmpty()) {
             sortDirection = "desc";
         }
 
@@ -71,7 +74,9 @@ public class ContactRepository  {
         jpql += " order by c." + sortValue + " " + sortDirection;
 
         System.out.println("jpql: " + jpql);
-        TypedQuery<Contact> query = entityManager.createQuery(jpql, Contact.class);
+
+        Query query = entityManager.createNativeQuery(jpql);
+
         if (name != null && !name.isEmpty()) {
             query.setParameter("name", "%" + name + "%");
         }
@@ -82,12 +87,35 @@ public class ContactRepository  {
             query.setParameter("address", "%" + address + "%");
         }
 
-        return query.getResultList();
+        // if not using AliasedTupleSubsetResultTransformer
+        // return query.getResultList();
+        /*
+            [
+                [
+                    6,
+                    "somewhere",
+                    "haha@gmail.com",
+                    "drogba2"
+                ],
+                [
+                    5,
+                    "London",
+                    "lampard@gmail.com",
+                    "lampard"
+                ],
+                ...
+            ]
+        */
+
+        NativeQueryImpl nativeQuery = (NativeQueryImpl) query;
+        nativeQuery.setResultTransformer(AliasToEntityOrderedMapResultTransformer.INSTANCE);
+        return nativeQuery.getResultList();
+
     }
 
 
-    // find by Name, Email, Address. Sort by Name, Email, Address (asc, desc) with Pageable
-    public Page<Contact> search(String name, String email, String address, String sortValue, String sortDirection, Pageable pageable) {
+    // search with Pageable
+    public Page<Contact> searchWithPage(String name, String email, String address, String sortValue, String sortDirection, Pageable pageable) {
         String jpql = "select c from Contact c where 1=1";
         String countJpql = "select count(c) from Contact c where 1=1";
 
@@ -104,7 +132,7 @@ public class ContactRepository  {
             countJpql += " and c.address like :address";
         }
 
-        if(sortDirection == null || sortDirection.isEmpty()) {
+        if (sortDirection == null || sortDirection.isEmpty()) {
             sortDirection = "desc";
         }
 
@@ -152,8 +180,5 @@ public class ContactRepository  {
 
         return new PageImpl<>(contacts, pageable, count);
     }
-
-    // TODO: example of finding by Name, Email, Address. Sort by Name, Email, Address (asc, desc) with Pageable and JOIN other tables
-    // TODO: retrieve data from table that does not exist in entity folder
 
 }
